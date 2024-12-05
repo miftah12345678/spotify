@@ -8,6 +8,16 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
+  	body {
+    font-family: 'Roboto', Helvetica, Arial, sans-serif;
+    background-image: url('https://cdn.arifzyn.tech/f/pac2oeis.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #000; 
+    height: 100vh; /* Ensures the background covers the entire viewport */
+    margin: 0; /* Removes default body margins */
+}
     .theme-dark {
       background-color: #1a202c;
       color: #cbd5e0;
@@ -30,7 +40,6 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-gray-200">
   <!-- Captcha Modal -->
   <div id="captchaModal" class="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-50 flex items-center justify-center">
     <div class="bg-white p-8 rounded-lg relative w-full max-w-sm dark:bg-gray-700">
@@ -120,7 +129,7 @@
       let currentSong = null;
       let favoriteSongs = JSON.parse(localStorage.getItem('favoriteSongs')) || [];
       const itemsPerPage = 5;
-      let currentPage = 1;
+      let currentPage = 2;
       let isDarkTheme = false;
       let captchaCode;
 
@@ -129,7 +138,7 @@
         const context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        captchaCode = Math.random().toString(36).substring(2, 8);
+        captchaCode = Math.random().toString(36).substring(2, 6);
         context.font = '30px Arial';
         context.fillStyle = '#000';
         context.fillText(captchaCode, 50, 35);
@@ -162,71 +171,82 @@
         document.getElementById('chatModal').classList.remove('hidden');
       });
 
-      document.getElementById('sendButton').addEventListener('click', sendMessage);
-      document.getElementById('clearButton').addEventListener('click', clearChat);
+// Opens the chat modal when the chat toggle button is clicked
+    document.getElementById('chatToggle').addEventListener('click', () => {
+    document.getElementById('chatModal').classList.remove('hidden');
+});
 
-      function sendMessage() {
-        const chatInput = document.getElementById('chatInput').value;
-        if (!chatInput) return;
+// Event listeners for sending and clearing messages
+document.getElementById('sendButton').addEventListener('click', sendMessage);
+document.getElementById('clearButton').addEventListener('click', clearChat);
 
-        addChatMessage(chatInput, 'user');
+// Function to send a message
+    function sendMessage() {
+    const chatInput = document.getElementById('chatInput').value;
+    if (!chatInput) return;
 
-        axios.post(`https://chatgpt4online.org/wp-json/mwai-ui/v1/chats/submit`, {
-          payload: {
+    addChatMessage(chatInput, 'user');
+
+    axios.post(`https://chatgpt4online.org/wp-json/mwai-ui/v1/chats/submit`, {
+        payload: {
             botId: "chatbot-qm966k",
-    customId: null,
-    session: "N/A",
-    chatId: "67uzmr9e1sv",
-    contextId: 5410,
-    messages: [
-      {
-        id: "6myn3fhk0vk",
-        role: "assistant",
-        content: "Hi! How can I help you?",
-        who: "AI: ",
-        timestamp: 1715992993960,
-      },
-    ],
-    newMessage: prompt,
-    newFileId: null,
-    stream: false,
-          },
-          headers: {
+            customId: null,
+            session: "N/A",
+            chatId: "67uzmr9e1sv",
+            contextId: 5410,
+            messages: [
+                {
+                    id: "6myn3fhk0vk",
+                    role: "assistant",
+                    content: "Hi! How can I help you?",
+                    who: "AI: ",
+                    timestamp: 1715992993960,
+                },
+            ],
+            newMessage: chatInput, // Gunakan chatInput sebagai pesan baru
+            newFileId: null,
+            stream: false,
+        },
+        headers: {
             'Content-Type': 'application/json',
             "X-WP-Nonce": "56bef00553",
-          }
-        })
-        .then(response => {
-          addChatMessage(response.data.reply, 'bot');
-        })
-        .catch(error => console.error(error));
+        }
+    })
+    .then(response => {
+        addChatMessage(response.data.reply, 'bot');
+    })
+    .catch(error => {
+        console.error("Error occurred while sending message:", error);
+        // Jika Anda ingin menampilkan pesan kesalahan kepada pengguna, Anda bisa menambahkannya di sini
+        addChatMessage("Gada AI, chat Ownernya aja >< https://wa.me/6282118696469", 'bot');
+    });
 
-        document.getElementById('chatInput').value = '';
-      }
+    document.getElementById('chatInput').value = '';
+}
 
-      function addChatMessage(message, sender) {
-        const chatContainer = document.getElementById('chatContainer');
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('flex', 'items-start', 'mb-4');
-        const avatar = document.createElement('div');
-        avatar.classList.add('w-8', 'h-8', 'rounded-full', 'bg-gray-300', 'flex', 'items-center', 'justify-center', 'mr-2');
-        avatar.textContent = sender === 'user' ? 'U': 'B';
-        const messageContent = document.createElement('div');
-        messageContent.classList.add('p-3', 'rounded-lg', 'bg-gray-200', 'dark:bg-gray-600', 'dark:text-white');
-        messageContent.textContent = message;
-        messageDiv.appendChild(avatar);
-        messageDiv.appendChild(messageContent);
-        chatContainer.appendChild(messageDiv);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      }
+// Function to add a chat message to the chat container
+function addChatMessage(message, sender) {
+    const chatContainer = document.getElementById('chatContainer');
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('flex', 'items-start', 'mb-4');
+    const avatar = document.createElement('div');
+    avatar.classList.add('w-8', 'h-8', 'rounded-full', 'bg-gray-300', 'flex', 'items-center', 'justify-center', 'mr-2');
+    avatar.textContent = sender === 'user' ? 'U' : 'B';
+    const messageContent = document.createElement('div');
+    messageContent.classList.add('p-3', 'rounded-lg', 'bg-gray-200', 'dark:bg-gray-600', 'dark:text-white');
+    messageContent.textContent = message;
+    messageDiv.appendChild(avatar);
+    messageDiv.appendChild(messageContent);
+    chatContainer.appendChild(messageDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to the bottom
+}
 
-      function clearChat() {
-        document.getElementById('chatContainer').innerHTML = '';
-      }
+// Function to clear the chat
+function clearChat() {
+    document.getElementById('chatContainer').innerHTML = '';
+}
 
-      function closeChat() {
-        document.getElementById('chatModal').classList.add('hidden');
-      }
+// Function to close the ⬤
 
       function search() {
         const query = document.getElementById('searchInput').value;
@@ -328,7 +348,7 @@
 
         currentFavorites.forEach((song, index) => {
           const favoriteItem = document.createElement('div');
-          favoriteItem.classList.add('flex', 'items-center', 'bg-white', 'rounded-lg', 'shadow-md', 'p-4', 'mb-4', 'dark:bg-gray-800');
+          favoriteItem.classList.add('flex', 'items-center', 'bg-blue', 'rounded-lg', 'shadow-md', 'p-4', 'mb-4', 'dark:bg-gray-800');
 
           const thumbnail = document.createElement('img');
           thumbnail.src = song.thumbnail;
